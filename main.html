@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embedded YouTube Video</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <div id="video-container">
+    <!-- Embedded YouTube video -->
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/Kxmf60tPaxk" frameborder="0" allowfullscreen></iframe>
+  </div>
+
+  <div id="likes-comments">
+    <p id="likes">Likes: <span id="likes-count"></span></p>
+    <p id="comments">Comments: <span id="comments-count"></span></p>
+  </div>
+
+  <!-- HTML markup -->
+  <div id="interactions">
+    <!-- Like button -->
+    <button id="like-btn">Like</button>
+    <!-- Comment input -->
+    <textarea id="comment-input" placeholder="Write a comment"></textarea>
+    <button id="comment-btn">Post Comment</button>
+    <!-- Subscribe button -->
+    <button id="subscribe-btn">Subscribe</button>
+
+    <button id="logoutBtn">Logout</button>
+  </div>
+ 
+  <!-- JavaScript code -->
+  <script>
+    $(document).ready(function() { 
+      // YouTube Data API key
+      var apiKey = 'AIzaSyB4Ts7XlICKHw_AByRDeE9quSZx850bQyY';
+      // YouTube video ID
+      var videoId = 'Kxmf60tPaxk';
+
+      // Fetch video details using YouTube Data API
+      $.get('https://www.googleapis.com/youtube/v3/videos', {
+        key: apiKey,
+        part: 'snippet,statistics',
+        id: videoId
+      }, function(data) {
+        // Display likes count
+        $('#likes-count').text(data.items[0].statistics.likeCount);
+        // Display comments count
+        $('#comments-count').text(data.items[0].statistics.commentCount);
+      });
+
+      // Event listener for the Like button
+      $('#like-btn').click(function() {
+        // Make API request to like the video
+        $.post('https://www.googleapis.com/youtube/v3/videos/rate', {
+          id: videoId,
+          rating: 'like',
+          key: apiKey
+        });
+      });
+
+      // Event listener for the Comment button
+      $('#comment-btn').click(function() {
+        var comment = $('#comment-input').val();
+        // Make API request to post a comment
+        $.post('https://www.googleapis.com/youtube/v3/commentThreads', {
+          snippet: {
+            videoId: videoId,
+            topLevelComment: {
+              snippet: {
+                textOriginal: comment
+              }
+            }
+          },
+          key: apiKey  
+        });
+      });
+
+      // Event listener for the Subscribe button
+      $('#subscribe-btn').click(function() {
+        // Make API request to subscribe to the channel
+        $.post('https://www.googleapis.com/youtube/v3/subscriptions', {
+           snippet: {
+            resourceId: {
+              channelId: 'UCPC-Vq5-fqqnTZzpGiifP2Q'
+            }
+          },
+          key: apiKey
+        });
+      });
+    });
+  </script>
+  
+  <script src="main.js"></script>
+</body>
+</html>
